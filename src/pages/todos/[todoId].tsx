@@ -17,7 +17,7 @@ const TodoId = (props: Props) => {
 
   if (todo.isLoading) {
     return (
-      <Flex>
+      <Flex flex="1" alignItems="center" justifyContent="center">
         <Spinner />
       </Flex>
     )
