@@ -78,5 +78,5 @@ model ChecklistItem {
     createdAt DateTime  @default(now())
     doneAt    DateTime?
     todoId    String
-    Todo      Todo      @relation(fields: [todoId], references: [id])
+    Todo      Todo      @relation(fields: [todoId], references: [id], onDelete: Cascade)
 }

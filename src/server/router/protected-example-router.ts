@@ -26,9 +26,15 @@ export const protectedExampleRouter = createProtectedRouter()
     },
   })
   .mutation('done', {
-    input: z.string(),
+    input: z.object({
+      id: z.string(),
+      isChecked: z.boolean(),
+    }),
     resolve: async ({ ctx, input }) => {
-      await ctx.prisma.todo.update({ data: { doneAt: new Date() }, where: { id: input } })
+      await ctx.prisma.todo.update({
+        data: { doneAt: input.isChecked ? new Date() : null },
+        where: { id: input.id },
+      })
     },
   })
   .mutation('update', {
@@ -38,6 +44,15 @@ export const protectedExampleRouter = createProtectedRouter()
     }),
     resolve: async ({ ctx, input }) => {
       await ctx.prisma.todo.update({ data: { body: input.body }, where: { id: input.id } })
+    },
+  })
+  .mutation('update-tag', {
+    input: z.object({
+      id: z.string(),
+      tag: z.string(),
+    }),
+    resolve: async ({ ctx, input }) => {
+      await ctx.prisma.todo.update({ data: { tag: input.tag }, where: { id: input.id } })
     },
   })
   .mutation('checklistdone', {
