@@ -7,7 +7,7 @@ interface Props {
 
 const Login = (props: Props) => {
   return (
-    <Flex flexDir="column" alignItems="center" gap={4}>
+    <Flex flex="1" flexDir="column" alignItems="center" gap={4}>
       <Heading size="3xl" fontWeight="light">
         Login
       </Heading>

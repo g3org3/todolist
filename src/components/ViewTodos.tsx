@@ -12,7 +12,7 @@ interface Props {
 const ViewTodos = (props: Props) => {
   const ref = useRef(null)
   const toaster = useToast()
-  const [showAll, setShowAll] = useState(false)
+  const [showAll, setShowAll] = useState(true)
   const [search, setSearch] = useState('')
   const { invalidateQueries } = trpc.useContext()
   const todos = trpc.useQuery(['auth.todolist'])

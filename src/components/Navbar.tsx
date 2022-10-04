@@ -1,5 +1,6 @@
 import { Flex, Container, Heading, Spacer } from '@chakra-ui/react'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 
 import AvatarMenu from './AvatarMenu'
 
@@ -14,7 +15,7 @@ const Navbar = (props: Props) => {
     <Flex py={2} boxShadow="md" bg="white">
       <Container display="flex" maxW="container.xl">
         <Heading display="flex" fontWeight="light">
-          Todolist
+          <Link href={status === 'authenticated' ? '/todos' : '/'}>Todolist</Link>
         </Heading>
         <Spacer />
         <AvatarMenu

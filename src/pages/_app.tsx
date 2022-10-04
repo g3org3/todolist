@@ -8,14 +8,17 @@ import { SessionProvider } from 'next-auth/react'
 import type { AppType } from 'next/app'
 import superjson from 'superjson'
 
-import type { AppRouter } from '../server/router'
-import '../styles/globals.css'
+import Layout from 'components/Layout'
+import type { AppRouter } from 'server/router'
+import 'styles/globals.css'
 
 const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { session, ...pageProps } }) => {
   return (
     <SessionProvider session={session}>
       <ChakraProvider>
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </ChakraProvider>
     </SessionProvider>
   )

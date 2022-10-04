@@ -14,6 +14,12 @@ export const protectedExampleRouter = createProtectedRouter()
       })
     },
   })
+  .query('todoid', {
+    input: z.string(),
+    resolve: ({ ctx, input }) => {
+      return ctx.prisma.todo.findFirstOrThrow({ where: { id: input } })
+    },
+  })
   .query('checklist', {
     input: z.string(),
     resolve: ({ ctx, input }) => {
