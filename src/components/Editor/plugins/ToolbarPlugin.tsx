@@ -9,6 +9,7 @@ import {
 } from '@lexical/list'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text'
+// @ts-ignore
 import { $isParentElementRTL, $wrapLeafNodesInElements, $isAtNodeEnd } from '@lexical/selection'
 import { $getNearestNodeOfType, mergeRegister } from '@lexical/utils'
 import {
@@ -44,13 +45,15 @@ const blockTypeToBlockName = {
   paragraph: 'Normal',
   quote: 'Quote',
   ul: 'Bulleted List',
-}
-
+} as const
+type TblockTypeToBlockName = typeof blockTypeToBlockName
+type TblockTypeToBlockNameKey = keyof typeof blockTypeToBlockName
+type TblockTypeToBlockNameValue = TblockTypeToBlockName[TblockTypeToBlockNameKey]
 function Divider() {
   return <div className="divider" />
 }
 
-function positionEditorElement(editor, rect) {
+function positionEditorElement(editor: any, rect: any) {
   if (rect === null) {
     editor.style.opacity = '0'
     editor.style.top = '-1000px'
@@ -62,7 +65,7 @@ function positionEditorElement(editor, rect) {
   }
 }
 
-function FloatingLinkEditor({ editor }) {
+function FloatingLinkEditor({ editor }: { editor: any }) {
   const editorRef = useRef(null)
   const inputRef = useRef(null)
   const mouseDownRef = useRef(false)
@@ -71,7 +74,7 @@ function FloatingLinkEditor({ editor }) {
   const [lastSelection, setLastSelection] = useState(null)
 
   const updateLinkEditor = useCallback(() => {
-    const selection = $getSelection()
+    const selection: any = $getSelection()
     if ($isRangeSelection(selection)) {
       const node = getSelectedNode(selection)
       const parent = node.getParent()
@@ -84,7 +87,7 @@ function FloatingLinkEditor({ editor }) {
       }
     }
     const editorElem = editorRef.current
-    const nativeSelection = window.getSelection()
+    const nativeSelection: any = window.getSelection()
     const activeElement = document.activeElement
 
     if (editorElem === null) {
@@ -126,7 +129,7 @@ function FloatingLinkEditor({ editor }) {
 
   useEffect(() => {
     return mergeRegister(
-      editor.registerUpdateListener(({ editorState }) => {
+      editor.registerUpdateListener(({ editorState }: any) => {
         editorState.read(() => {
           updateLinkEditor()
         })
@@ -152,7 +155,7 @@ function FloatingLinkEditor({ editor }) {
 
   useEffect(() => {
     if (isEditMode && inputRef.current) {
-      inputRef.current.focus()
+      ;(inputRef.current as any).focus()
     }
   }, [isEditMode])
 
@@ -203,11 +206,11 @@ function FloatingLinkEditor({ editor }) {
   )
 }
 
-function Select({ onChange, className, options, value }) {
+function Select({ onChange, className, options, value }: any) {
   return (
     <select className={className} onChange={onChange} value={value}>
       <option hidden={true} value="" />
-      {options.map((option) => (
+      {options.map((option: any) => (
         <option key={option} value={option}>
           {option}
         </option>
@@ -216,7 +219,7 @@ function Select({ onChange, className, options, value }) {
   )
 }
 
-function getSelectedNode(selection) {
+function getSelectedNode(selection: any) {
   const anchor = selection.anchor
   const focus = selection.focus
   const anchorNode = selection.anchor.getNode()
@@ -232,12 +235,12 @@ function getSelectedNode(selection) {
   }
 }
 
-function BlockOptionsDropdownList({ editor, blockType, toolbarRef, setShowBlockOptionsDropDown }) {
+function BlockOptionsDropdownList({ editor, blockType, toolbarRef, setShowBlockOptionsDropDown }: any) {
   const dropDownRef = useRef(null)
 
   useEffect(() => {
     const toolbar = toolbarRef.current
-    const dropDown = dropDownRef.current
+    const dropDown: any = dropDownRef.current
 
     if (toolbar !== null && dropDown !== null) {
       const { top, left } = toolbar.getBoundingClientRect()
@@ -251,9 +254,9 @@ function BlockOptionsDropdownList({ editor, blockType, toolbarRef, setShowBlockO
     const toolbar = toolbarRef.current
 
     if (dropDown !== null && toolbar !== null) {
-      const handle = (event) => {
+      const handle = (event: any) => {
         const target = event.target
-
+        // @ts-ignore
         if (!dropDown.contains(target) && !toolbar.contains(target)) {
           setShowBlockOptionsDropDown(false)
         }
@@ -395,7 +398,9 @@ export default function ToolbarPlugin() {
   const toolbarRef = useRef(null)
   const [canUndo, setCanUndo] = useState(false)
   const [canRedo, setCanRedo] = useState(false)
-  const [blockType, setBlockType] = useState('paragraph')
+  const [blockType, setBlockType] = useState<TblockTypeToBlockNameValue>(
+    'paragraph' as TblockTypeToBlockNameValue
+  )
   const [selectedElementKey, setSelectedElementKey] = useState(null)
   const [showBlockOptionsDropDown, setShowBlockOptionsDropDown] = useState(false)
   const [codeLanguage, setCodeLanguage] = useState('')
@@ -412,17 +417,17 @@ export default function ToolbarPlugin() {
     if ($isRangeSelection(selection)) {
       const anchorNode = selection.anchor.getNode()
       const element = anchorNode.getKey() === 'root' ? anchorNode : anchorNode.getTopLevelElementOrThrow()
-      const elementKey = element.getKey()
+      const elementKey: any = element.getKey()
       const elementDOM = editor.getElementByKey(elementKey)
       if (elementDOM !== null) {
         setSelectedElementKey(elementKey)
         if ($isListNode(element)) {
           const parentList = $getNearestNodeOfType(anchorNode, ListNode)
           const type = parentList ? parentList.getTag() : element.getTag()
-          setBlockType(type)
+          setBlockType(type as TblockTypeToBlockNameValue)
         } else {
           const type = $isHeadingNode(element) ? element.getTag() : element.getType()
-          setBlockType(type)
+          setBlockType(type as TblockTypeToBlockNameValue)
           if ($isCodeNode(element)) {
             setCodeLanguage(element.getLanguage() || getDefaultCodeLanguage())
           }
@@ -486,7 +491,7 @@ export default function ToolbarPlugin() {
 
   const codeLanguges = useMemo(() => getCodeLanguages(), [])
   const onCodeLanguageSelect = useCallback(
-    (e) => {
+    (e: any) => {
       editor.update(() => {
         if (selectedElementKey !== null) {
           const node = $getNodeByKey(selectedElementKey)
@@ -512,7 +517,7 @@ export default function ToolbarPlugin() {
       <button
         disabled={!canUndo}
         onClick={() => {
-          editor.dispatchCommand(UNDO_COMMAND)
+          editor.dispatchCommand(UNDO_COMMAND, undefined)
         }}
         className="toolbar-item spaced"
         aria-label="Undo"
@@ -522,7 +527,7 @@ export default function ToolbarPlugin() {
       <button
         disabled={!canRedo}
         onClick={() => {
-          editor.dispatchCommand(REDO_COMMAND)
+          editor.dispatchCommand(REDO_COMMAND, undefined)
         }}
         className="toolbar-item"
         aria-label="Redo"
@@ -538,7 +543,7 @@ export default function ToolbarPlugin() {
             aria-label="Formatting Options"
           >
             <span className={'icon block-type ' + blockType} />
-            <span className="text">{blockTypeToBlockName[blockType]}</span>
+            <span className="text">{blockTypeToBlockName[blockType as TblockTypeToBlockNameKey]}</span>
             <i className="chevron-down" />
           </button>
           {showBlockOptionsDropDown &&
@@ -554,6 +559,7 @@ export default function ToolbarPlugin() {
           <Divider />
         </>
       )}
+      {/* @ts-ignore */}
       {blockType === 'code' ? (
         <>
           <Select
