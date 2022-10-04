@@ -5,27 +5,30 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter,
-  Button,
   useDisclosure,
+  ModalProps,
 } from '@chakra-ui/react'
 
-interface Props {
+interface Props extends Omit<ModalProps, 'onClose' | 'isOpen'> {
   title?: string
   onClose?: VoidFunction
   children: React.ReactNode
+  close?: VoidFunction
 }
 
 const _Modal = (props: Props) => {
-  const { isOpen, onOpen, onClose } = useDisclosure({ isOpen: true })
+  const { isOpen, onClose } = useDisclosure({ isOpen: true })
+
+  const onC = () => {
+    onClose()
+    if (props.close) props.close()
+  }
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal size={props.size} isOpen={isOpen} onClose={onC}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{props.title}</ModalHeader>
-          <ModalCloseButton />
           <ModalBody>{props.children}</ModalBody>
         </ModalContent>
       </Modal>

@@ -6,7 +6,7 @@ import { getFormValues } from 'utils/form'
 import { trpc } from 'utils/trpc'
 
 interface Props {
-  //
+  onSuccess: VoidFunction
 }
 
 const CreateTodo = (props: Props) => {
@@ -16,6 +16,7 @@ const CreateTodo = (props: Props) => {
   const createTodo = trpc.useMutation('auth.create', {
     onSuccess() {
       invalidateQueries(['auth.todolist'])
+      props.onSuccess()
       toaster({ title: 'success', status: 'success' })
     },
     onError(err) {
@@ -39,6 +40,7 @@ const CreateTodo = (props: Props) => {
         _hover={{ background: 'white' }}
         _focus={{ background: 'white' }}
         size="lg"
+        fontSize="3xl"
         name="title"
         disabled={createTodo.isLoading}
         placeholder="another todo 🥸?"

@@ -1,9 +1,12 @@
-import { Flex, Badge, Button, Text, useToast, Input } from '@chakra-ui/react'
+import { Flex, Badge, Button, Text, useToast, Input, useDisclosure } from '@chakra-ui/react'
 import autoAnimate from '@formkit/auto-animate'
 import { DateTime } from 'luxon'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { TodoOut, trpc } from 'utils/trpc'
+
+import CreateTodo from './CreateTodo'
+import Modal from './Modal'
 
 interface Props {
   onClickSelect: (todo: TodoOut) => void
@@ -15,6 +18,7 @@ const ViewTodos = (props: Props) => {
   const [showAll, setShowAll] = useState(true)
   const [search, setSearch] = useState('')
   const { invalidateQueries } = trpc.useContext()
+  const { isOpen, onClose, onOpen } = useDisclosure()
   const todos = trpc.useQuery(['auth.todolist'])
   const doneTodo = trpc.useMutation('auth.done', {
     onSuccess() {
@@ -34,6 +38,25 @@ const ViewTodos = (props: Props) => {
       toaster({ title: 'Error', description: err.message, status: 'error' })
     },
   })
+  const handleKeyPress = useCallback(
+    (event: any) => {
+      if (!isOpen && event.key === 'n') {
+        event.preventDefault()
+        onOpen()
+      }
+    },
+    [isOpen]
+  )
+
+  useEffect(() => {
+    // attach the event listener
+    document.addEventListener('keydown', handleKeyPress)
+
+    // remove the event listener
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [handleKeyPress])
 
   useEffect(() => {
     ref.current && autoAnimate(ref.current)
@@ -53,11 +76,16 @@ const ViewTodos = (props: Props) => {
 
   return (
     <>
+      {isOpen && (
+        <Modal size="4xl" close={onClose}>
+          <CreateTodo onSuccess={onClose} />
+        </Modal>
+      )}
       <Flex gap={4}>
         <Button isActive={showAll} onClick={() => setShowAll(!showAll)} colorScheme="green" variant="outline">
           show all
         </Button>
-        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="search" />
+        <Input bg="white" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="search" />
         <Button onClick={() => setSearch('')} variant="outline">
           clear
         </Button>
