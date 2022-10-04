@@ -42,7 +42,7 @@ const Home: NextPage = () => {
           {selected ? (
             <ViewTodo selected={selected} onClickReset={() => setSelected(null)} />
           ) : (
-            <ViewTodos onClickSelect={(todo) => setSelected(todo)} />
+            <ViewTodos onClickSelect={setSelected} />
           )}
           <Flex mb={4} color="#999">
             Created by JA 🇬🇹 ❤️

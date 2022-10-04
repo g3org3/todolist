@@ -1,7 +1,8 @@
-import { Flex, Button, Heading, Input, Checkbox, useToast } from '@chakra-ui/react'
+import { Flex, Button, Heading, Input, Checkbox, useToast, Spacer } from '@chakra-ui/react'
 import autoAnimate from '@formkit/auto-animate'
 import cuid from 'cuid'
-import { useEffect, useRef } from 'react'
+import { LexicalEditor } from 'lexical'
+import { useEffect, useRef, useState } from 'react'
 
 import { getFormValues } from 'utils/form'
 import { TodoOut, trpc } from 'utils/trpc'
@@ -16,8 +17,19 @@ interface Props {
 const ViewTodo = (props: Props) => {
   const toaster = useToast()
   const { invalidateQueries } = trpc.useContext()
+  const [editor, setEditor] = useState<LexicalEditor | null>(null)
+
   const checklists = trpc.useQuery(['auth.checklist', props.selected.id])
   const createChecklist = trpc.useMutation('auth.createChecklist', {
+    onSuccess() {
+      invalidateQueries(['auth.checklist'])
+      toaster({ title: 'success', status: 'success' })
+    },
+    onError(err) {
+      toaster({ title: 'Error', description: err.message, status: 'error' })
+    },
+  })
+  const updateBody = trpc.useMutation('auth.update', {
     onSuccess() {
       invalidateQueries(['auth.checklist'])
       toaster({ title: 'success', status: 'success' })
@@ -55,6 +67,15 @@ const ViewTodo = (props: Props) => {
     entity.title.value = ''
   }
 
+  const onSave = () => {
+    if (!editor) return
+
+    updateBody.mutate({
+      id: props.selected.id,
+      body: JSON.stringify(editor.getEditorState()),
+    })
+  }
+
   return (
     <Flex flexDir="column" flex="1" gap={5}>
       <Flex alignItems="center" gap={4} bg="white" boxShadow="md" p={2}>
@@ -62,10 +83,14 @@ const ViewTodo = (props: Props) => {
           ◀️
         </Button>
         <Heading fontWeight="light">{props.selected.title}</Heading>
+        <Spacer />
+        <Button isLoading={updateBody.isLoading} onClick={onSave} variant="outline" colorScheme="blue">
+          Save
+        </Button>
       </Flex>
       <Flex gap={5} alignItems="flex-start">
         <Flex flex="1" boxShadow="md">
-          <Editor />
+          <Editor value={props.selected.body} setEditor={setEditor} />
         </Flex>
         <Flex minH="200px" w="30%" bg="white" flexDir="column" boxShadow="md">
           <Heading bg="blue.100" size="lg" textAlign="center" fontWeight="light">
