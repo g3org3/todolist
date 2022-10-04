@@ -51,6 +51,7 @@ const editorConfig = {
 
 export default function Editor() {
   return (
+    // @ts-ignore
     <LexicalComposer initialConfig={editorConfig}>
       <div className="editor-container">
         <ToolbarPlugin />
