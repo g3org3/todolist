@@ -2,9 +2,8 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalCloseButton,
   ModalBody,
+  ModalHeader,
   useDisclosure,
   ModalProps,
 } from '@chakra-ui/react'
@@ -17,17 +16,18 @@ interface Props extends Omit<ModalProps, 'onClose' | 'isOpen'> {
 }
 
 const _Modal = (props: Props) => {
-  const { isOpen, onClose } = useDisclosure({ isOpen: true })
+  const state = useDisclosure({ isOpen: true })
 
-  const onC = () => {
-    onClose()
+  const onClose = () => {
+    state.onClose()
     if (props.close) props.close()
   }
 
   return (
     <>
-      <Modal size={props.size} isOpen={isOpen} onClose={onC}>
-        <ModalOverlay />
+      <Modal size={props.size} isOpen={state.isOpen} onClose={onClose}>
+        <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px) hue-rotate(90deg)" />
+        {props.title && <ModalHeader>{props.title}</ModalHeader>}
         <ModalContent>
           <ModalBody>{props.children}</ModalBody>
         </ModalContent>

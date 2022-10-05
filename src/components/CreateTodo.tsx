@@ -40,10 +40,11 @@ const CreateTodo = (props: Props) => {
         _hover={{ background: 'white' }}
         _focus={{ background: 'white' }}
         size="lg"
-        fontSize="3xl"
+        fontSize="4xl"
+        variant="unstyled"
         name="title"
         disabled={createTodo.isLoading}
-        placeholder="another todo 🥸?"
+        placeholder="What is the todo 🤓?"
       />
       <Button type="submit" display="none">
         add

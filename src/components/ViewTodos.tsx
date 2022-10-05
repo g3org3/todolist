@@ -1,8 +1,9 @@
 import { Flex, Badge, Button, Text, useToast, Input, useDisclosure } from '@chakra-ui/react'
 import autoAnimate from '@formkit/auto-animate'
 import { DateTime } from 'luxon'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
+import { useShortcut } from 'utils/shortcuts'
 import { TodoOut, trpc } from 'utils/trpc'
 
 import CreateTodo from './CreateTodo'
@@ -15,10 +16,23 @@ interface Props {
 const ViewTodos = (props: Props) => {
   const ref = useRef(null)
   const toaster = useToast()
+  const createTodoModalState = useDisclosure()
+  const searchModalState = useDisclosure()
+  useShortcut({
+    'meta-j': (e: any) => {
+      if (!createTodoModalState.isOpen) {
+        createTodoModalState.onOpen()
+      }
+    },
+    'meta-k': () => {
+      if (!searchModalState.isOpen) {
+        searchModalState.onOpen()
+      }
+    },
+  })
   const [showAll, setShowAll] = useState(true)
   const [search, setSearch] = useState('')
   const { invalidateQueries } = trpc.useContext()
-  const { isOpen, onClose, onOpen } = useDisclosure()
   const todos = trpc.useQuery(['auth.todolist'])
   const doneTodo = trpc.useMutation('auth.done', {
     onSuccess() {
@@ -38,25 +52,6 @@ const ViewTodos = (props: Props) => {
       toaster({ title: 'Error', description: err.message, status: 'error' })
     },
   })
-  const handleKeyPress = useCallback(
-    (event: any) => {
-      if (!isOpen && event.key === 'n') {
-        event.preventDefault()
-        onOpen()
-      }
-    },
-    [isOpen]
-  )
-
-  useEffect(() => {
-    // attach the event listener
-    document.addEventListener('keydown', handleKeyPress)
-
-    // remove the event listener
-    return () => {
-      document.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [handleKeyPress])
 
   useEffect(() => {
     ref.current && autoAnimate(ref.current)
@@ -68,6 +63,12 @@ const ViewTodos = (props: Props) => {
   const onDone = (id: string, isChecked: boolean) => () => {
     doneTodo.mutate({ id, isChecked })
   }
+  const searchRef = useRef<HTMLInputElement>(null)
+  const onSearch = () => {
+    const value = searchRef.current?.value || ''
+    setSearch(value)
+    searchModalState.onClose()
+  }
 
   const filteredTodos =
     todos.data
@@ -76,18 +77,33 @@ const ViewTodos = (props: Props) => {
 
   return (
     <>
-      {isOpen && (
-        <Modal size="4xl" close={onClose}>
-          <CreateTodo onSuccess={onClose} />
+      {createTodoModalState.isOpen && (
+        <Modal size="4xl" close={createTodoModalState.onClose}>
+          <CreateTodo onSuccess={createTodoModalState.onClose} />
         </Modal>
       )}
-      <Flex gap={4}>
+      {searchModalState.isOpen && (
+        <Modal size="4xl" close={searchModalState.onClose}>
+          <form onSubmit={onSearch}>
+            <Input placeholder="search" fontSize="4xl" variant="unstyled" ref={searchRef} />
+            <Button display="none">submit</Button>
+          </form>
+        </Modal>
+      )}
+      <Flex gap={4} py={2}>
         <Button isActive={showAll} onClick={() => setShowAll(!showAll)} colorScheme="green" variant="outline">
           show all
         </Button>
-        <Input bg="white" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="search" />
-        <Button onClick={() => setSearch('')} variant="outline">
-          clear
+        <Button colorScheme="purple" onClick={() => createTodoModalState.onOpen()} variant="outline">
+          new todo
+        </Button>
+        <Button
+          colorScheme={!!search ? 'blue' : 'gray'}
+          isActive={!!search}
+          onClick={() => setSearch('')}
+          variant="outline"
+        >
+          clear search
         </Button>
       </Flex>
       <Flex flexDir="column" ref={ref} flex="1" overflow="auto" gap={2}>

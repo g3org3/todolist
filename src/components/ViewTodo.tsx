@@ -2,9 +2,11 @@ import { Flex, Button, Heading, Input, Checkbox, useToast, Spacer } from '@chakr
 import autoAnimate from '@formkit/auto-animate'
 import cuid from 'cuid'
 import { LexicalEditor } from 'lexical'
+import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { getFormValues } from 'utils/form'
+import { useShortcut } from 'utils/shortcuts'
 import { TodoOut, trpc } from 'utils/trpc'
 
 import Editor from './Editor'
@@ -16,9 +18,12 @@ interface Props {
 
 const ViewTodo = (props: Props) => {
   const toaster = useToast()
+  const router = useRouter()
   const { invalidateQueries } = trpc.useContext()
   const [editor, setEditor] = useState<LexicalEditor | null>(null)
-
+  useShortcut({
+    Escape: () => router.push('/todos'),
+  })
   const checklists = trpc.useQuery(['auth.checklist', props.selected.id])
   const createChecklist = trpc.useMutation('auth.createChecklist', {
     onSuccess() {
