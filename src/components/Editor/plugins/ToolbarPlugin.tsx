@@ -1,3 +1,4 @@
+import { Button, Flex, Input, useDisclosure } from '@chakra-ui/react'
 import { $createCodeNode, $isCodeNode, getDefaultCodeLanguage, getCodeLanguages } from '@lexical/code'
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import {
@@ -26,6 +27,8 @@ import {
 } from 'lexical'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+
+import Modal from 'components/Modal'
 
 import { INSERT_EXCALIDRAW_COMMAND } from './ExcalidrawPlugin'
 import { INSERT_YOUTUBE_COMMAND } from './YoutubePlugin'
@@ -670,16 +673,46 @@ export default function ToolbarPlugin() {
           >
             excalidraw
           </button>
-          <button
-            onClick={() => {
-              editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, 'MsSH2BlWiA8')
-            }}
-            className="toolbar-item"
-          >
-            youtube
-          </button>
+          <YTButton editor={editor} />
         </>
       )}
     </div>
+  )
+}
+
+const YTButton = ({ editor }: { editor: any }) => {
+  const inputref = useRef<HTMLInputElement>(null)
+  const state = useDisclosure()
+
+  const onClick = () => {
+    if (!inputref.current) return
+    const VIDEO_MATCHER = /\?v=(\w+)/
+    const { value } = inputref.current
+    const match = VIDEO_MATCHER.exec(value)
+    if (!match) return
+
+    const code = match[1]
+    editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, code)
+    state.onClose()
+  }
+
+  return (
+    <Modal
+      close={state.onClose}
+      isOpen={state.isOpen}
+      Button={() => (
+        <button onClick={() => state.onOpen()} className="toolbar-item">
+          youtube
+        </button>
+      )}
+      size="3xl"
+    >
+      <Flex alignItems="center">
+        <Input ref={inputref} fontSize="4xl" variant="unstyled" />
+        <Button onClick={onClick} size="lg">
+          add
+        </Button>
+      </Flex>
+    </Modal>
   )
 }

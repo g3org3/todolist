@@ -104,7 +104,7 @@ const ViewTodo = (props: Props) => {
   }
 
   return (
-    <Flex flexDir="column" flex="1" gap={5}>
+    <Flex flexDir="column" flex="1" gap={5} overflow="auto">
       <Flex alignItems="center" gap={4} bg="white" boxShadow="md" p={2}>
         <HeaderTodo
           onUpdateTitle={onUpdateTitle}
@@ -115,7 +115,12 @@ const ViewTodo = (props: Props) => {
           onClickEdit={onClick}
         />
       </Flex>
-      <Flex gap={5} alignItems={{ base: 'unset', md: 'flex-start' }} flexDir={{ base: 'column', md: 'row' }}>
+      <Flex
+        overflow="auto"
+        gap={5}
+        alignItems={{ base: 'unset', md: 'flex-start' }}
+        flexDir={{ base: 'column', md: 'row' }}
+      >
         <Flex flex="1" boxShadow="md" overflow="auto" bg="white">
           {!isEditable && !props.selected.body && (
             <Flex bg="white" w="100%" h="300px" alignItems="center" justifyContent="center">

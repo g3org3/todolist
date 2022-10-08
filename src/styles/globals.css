@@ -794,9 +794,9 @@ i.justify-align {
 
 .ExcalidrawModal__row {
   position: relative;
-  padding: 40px 5px 5px;
+  padding: 51px 5px 5px;
   width: 70vw;
-  height: 70vh;
+  height: 80vh;
   border-radius: 8px;
   box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1),
     inset 0 0 0 1px rgba(255, 255, 255, 0.5);

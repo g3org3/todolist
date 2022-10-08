@@ -13,10 +13,12 @@ interface Props extends Omit<ModalProps, 'onClose' | 'isOpen'> {
   onClose?: VoidFunction
   children: React.ReactNode
   close?: VoidFunction
+  Button?: () => JSX.Element
+  isOpen?: boolean
 }
 
 const _Modal = (props: Props) => {
-  const state = useDisclosure({ isOpen: true })
+  const state = useDisclosure({ isOpen: props.Button ? undefined : true })
 
   const onClose = () => {
     state.onClose()
@@ -25,7 +27,12 @@ const _Modal = (props: Props) => {
 
   return (
     <>
-      <Modal size={props.size} isOpen={state.isOpen} onClose={onClose}>
+      {props.Button && <props.Button />}
+      <Modal
+        size={props.size}
+        isOpen={props.isOpen != undefined ? props.isOpen : state.isOpen}
+        onClose={onClose}
+      >
         <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px) hue-rotate(90deg)" />
         {props.title && <ModalHeader>{props.title}</ModalHeader>}
         <ModalContent>
