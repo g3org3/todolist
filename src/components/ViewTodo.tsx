@@ -146,7 +146,15 @@ const ViewTodo = (props: Props) => {
             />
           )}
         </Flex>
-        <Flex minH="200px" w={{ base: 'unset', md: '30%' }} bg="white" flexDir="column" boxShadow="md">
+        <Flex
+          minH="200px"
+          position="sticky"
+          top="0"
+          w={{ base: 'unset', md: '30%' }}
+          bg="white"
+          flexDir="column"
+          boxShadow="md"
+        >
           <Heading bg="blue.100" size="lg" textAlign="center" fontWeight="light">
             Checklist
           </Heading>
