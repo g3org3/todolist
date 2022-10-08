@@ -13,9 +13,9 @@ const TodoId = (props: Props) => {
   useSession({ required: true })
   const router = useRouter()
   const todoId = router.query.todoId as string
-  const todo = trpc.useQuery(['auth.todoid', todoId])
+  const todo = trpc.useQuery(['auth.todoid', todoId], { enabled: !!todoId })
 
-  if (todo.isLoading) {
+  if (todo.isLoading || !todo.data) {
     return (
       <Flex flex="1" flexDir="column" alignItems="center" justifyContent="center">
         <Spinner />

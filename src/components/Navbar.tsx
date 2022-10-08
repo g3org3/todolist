@@ -12,9 +12,9 @@ const Navbar = (props: Props) => {
   const { status, data } = useSession()
 
   return (
-    <Flex py={2} boxShadow="md" bg="white">
-      <Container display="flex" maxW="container.xl">
-        <Heading display="flex" fontWeight="light">
+    <Flex boxShadow="md" bg="white">
+      <Container display="flex" maxW="container.xl" alignItems="center">
+        <Heading fontSize="3xl" display="flex" fontWeight="light">
           <Link href={status === 'authenticated' ? '/todos' : '/'}>Todolist</Link>
         </Heading>
         <Spacer />

@@ -1,15 +1,16 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { LexicalEditor } from 'lexical'
+import { MutableRefObject } from 'react'
 
 interface Props {
-  setEditor?: (editor: LexicalEditor) => void
+  editorRef: MutableRefObject<LexicalEditor | undefined>
   value?: string
 }
 
 const FormPlugin = (props: Props) => {
   const [editor] = useLexicalComposerContext()
 
-  if (props.setEditor) props.setEditor(editor)
+  props.editorRef.current = editor
 
   return null
 }

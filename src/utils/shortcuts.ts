@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react'
 
-export const useShortcut = (obj: any = {}) => {
+export const useShortcut = (obj: any = {}, deps: any[]) => {
   let previousKey = ''
   const handleKeyPress = useCallback((event: any) => {
     let hash = (event.metaKey ? 'meta-' : '') + event.key
@@ -13,7 +13,7 @@ export const useShortcut = (obj: any = {}) => {
       func(event)
     }
     previousKey = event.key
-  }, [])
+  }, deps)
 
   useEffect(() => {
     // attach the event listener

@@ -1,4 +1,4 @@
-import { AutoLinkPlugin } from '@lexical/react/LexicalAutoLinkPlugin'
+import { AutoLinkPlugin, LinkMatcher } from '@lexical/react/LexicalAutoLinkPlugin'
 
 const URL_MATCHER =
   /((https?:\/\/(www\.)?)|(www\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/
@@ -11,9 +11,9 @@ const MATCHERS = [
     const match = URL_MATCHER.exec(text)
 
     return (
-      match && {
+      match &&
+      match[0] && {
         index: match.index,
-        // @ts-ignore
         length: match[0].length,
         text: match[0],
         url: match[0],
@@ -24,9 +24,9 @@ const MATCHERS = [
     const match = EMAIL_MATCHER.exec(text)
 
     return (
-      match && {
+      match &&
+      match[0] && {
         index: match.index,
-        // @ts-ignore
         length: match[0].length,
         text: match[0],
         url: `mailto:${match[0]}`,
@@ -36,6 +36,5 @@ const MATCHERS = [
 ]
 
 export default function PlaygroundAutoLinkPlugin() {
-  // @ts-ignore
-  return <AutoLinkPlugin matchers={MATCHERS} />
+  return <AutoLinkPlugin matchers={MATCHERS as LinkMatcher[]} />
 }

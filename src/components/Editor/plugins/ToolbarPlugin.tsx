@@ -9,8 +9,7 @@ import {
 } from '@lexical/list'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text'
-// @ts-ignore
-import { $isParentElementRTL, $wrapLeafNodesInElements, $isAtNodeEnd } from '@lexical/selection'
+import { $isParentElementRTL, $wrapNodes, $isAtNodeEnd } from '@lexical/selection'
 import { $getNearestNodeOfType, mergeRegister } from '@lexical/utils'
 import {
   CAN_REDO_COMMAND,
@@ -29,6 +28,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { INSERT_EXCALIDRAW_COMMAND } from './ExcalidrawPlugin'
+import { INSERT_YOUTUBE_COMMAND } from './YoutubePlugin'
 
 const LowPriority = 1
 
@@ -275,7 +275,7 @@ function BlockOptionsDropdownList({ editor, blockType, toolbarRef, setShowBlockO
         const selection = $getSelection()
 
         if ($isRangeSelection(selection)) {
-          $wrapLeafNodesInElements(selection, () => $createParagraphNode())
+          $wrapNodes(selection, () => $createParagraphNode())
         }
       })
     }
@@ -288,7 +288,7 @@ function BlockOptionsDropdownList({ editor, blockType, toolbarRef, setShowBlockO
         const selection = $getSelection()
 
         if ($isRangeSelection(selection)) {
-          $wrapLeafNodesInElements(selection, () => $createHeadingNode('h1'))
+          $wrapNodes(selection, () => $createHeadingNode('h1'))
         }
       })
     }
@@ -301,7 +301,7 @@ function BlockOptionsDropdownList({ editor, blockType, toolbarRef, setShowBlockO
         const selection = $getSelection()
 
         if ($isRangeSelection(selection)) {
-          $wrapLeafNodesInElements(selection, () => $createHeadingNode('h2'))
+          $wrapNodes(selection, () => $createHeadingNode('h2'))
         }
       })
     }
@@ -332,7 +332,7 @@ function BlockOptionsDropdownList({ editor, blockType, toolbarRef, setShowBlockO
         const selection = $getSelection()
 
         if ($isRangeSelection(selection)) {
-          $wrapLeafNodesInElements(selection, () => $createQuoteNode())
+          $wrapNodes(selection, () => $createQuoteNode())
         }
       })
     }
@@ -345,7 +345,7 @@ function BlockOptionsDropdownList({ editor, blockType, toolbarRef, setShowBlockO
         const selection = $getSelection()
 
         if ($isRangeSelection(selection)) {
-          $wrapLeafNodesInElements(selection, () => $createCodeNode())
+          $wrapNodes(selection, () => $createCodeNode())
         }
       })
     }
@@ -661,15 +661,22 @@ export default function ToolbarPlugin() {
             aria-label="Justify Align"
           >
             <i className="format justify-align" />
-          </button>{' '}
+          </button>
           <button
             onClick={() => {
               editor.dispatchCommand(INSERT_EXCALIDRAW_COMMAND, undefined)
             }}
             className="toolbar-item"
-            aria-label="Justify Align"
           >
             excalidraw
+          </button>
+          <button
+            onClick={() => {
+              editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, 'MsSH2BlWiA8')
+            }}
+            className="toolbar-item"
+          >
+            youtube
           </button>
         </>
       )}

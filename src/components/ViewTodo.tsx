@@ -20,11 +20,15 @@ const ViewTodo = (props: Props) => {
   const toaster = useToast()
   const router = useRouter()
   const { invalidateQueries } = trpc.useContext()
-  const [editor, setEditor] = useState<LexicalEditor | null>(null)
-  useShortcut({
-    Escape: () => router.push('/todos'),
-  })
-  const checklists = trpc.useQuery(['auth.checklist', props.selected.id])
+  const editorRef = useRef<LexicalEditor>()
+  const [isEditable, setEditable] = useState(false)
+  useShortcut(
+    {
+      Escape: () => router.push('/todos'),
+    },
+    []
+  )
+  const checklists = trpc.useQuery(['auth.checklist', props.selected.id], { enabled: !!props.selected.id })
   const createChecklist = trpc.useMutation('auth.createChecklist', {
     onSuccess() {
       invalidateQueries(['auth.checklist'])
@@ -73,12 +77,21 @@ const ViewTodo = (props: Props) => {
   }
 
   const onSave = () => {
-    if (!editor) return
+    if (!editorRef.current) return
 
     updateBody.mutate({
       id: props.selected.id,
-      body: JSON.stringify(editor.getEditorState()),
+      body: JSON.stringify(editorRef.current.getEditorState()),
     })
+  }
+
+  const onClick = () => {
+    if (isEditable) {
+      onSave()
+      setEditable(false)
+    } else {
+      setEditable(true)
+    }
   }
 
   return (
@@ -89,15 +102,37 @@ const ViewTodo = (props: Props) => {
         </Button>
         <Heading fontWeight="light">{props.selected.title}</Heading>
         <Spacer />
-        <Button isLoading={updateBody.isLoading} onClick={onSave} variant="outline" colorScheme="blue">
-          Save
+        <Button isLoading={updateBody.isLoading} onClick={onClick} variant="outline" colorScheme="blue">
+          {isEditable ? 'Save' : 'Edit'}
         </Button>
       </Flex>
-      <Flex gap={5} alignItems="flex-start">
-        <Flex flex="1" boxShadow="md">
-          <Editor value={props.selected.body} setEditor={setEditor} />
+      <Flex gap={5} alignItems={{ base: 'unset', md: 'flex-start' }} flexDir={{ base: 'column', md: 'row' }}>
+        <Flex flex="1" boxShadow="md" overflow="auto" bg="white">
+          {!isEditable && !props.selected.body && (
+            <Flex bg="white" w="100%" h="300px" alignItems="center" justifyContent="center">
+              <Button variant="outline" fontSize="3xl" size="lg" onClick={onClick}>
+                Add Notes
+              </Button>
+            </Flex>
+          )}
+          {isEditable && (
+            <Editor
+              key={`edit-${props.selected.id}`}
+              ref={editorRef}
+              isEditable
+              value={props.selected.body}
+            />
+          )}
+          {!isEditable && props.selected.body && (
+            <Editor
+              key={`read-${props.selected.id}-${props.selected.body}`}
+              ref={editorRef}
+              isEditable={false}
+              value={props.selected.body}
+            />
+          )}
         </Flex>
-        <Flex minH="200px" w="30%" bg="white" flexDir="column" boxShadow="md">
+        <Flex minH="200px" w={{ base: 'unset', md: '30%' }} bg="white" flexDir="column" boxShadow="md">
           <Heading bg="blue.100" size="lg" textAlign="center" fontWeight="light">
             Checklist
           </Heading>

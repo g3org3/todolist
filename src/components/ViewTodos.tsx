@@ -18,20 +18,37 @@ const ViewTodos = (props: Props) => {
   const toaster = useToast()
   const createTodoModalState = useDisclosure()
   const searchModalState = useDisclosure()
-  useShortcut({
-    'meta-j': (e: any) => {
-      if (!createTodoModalState.isOpen) {
-        createTodoModalState.onOpen()
-      }
-    },
-    'meta-k': () => {
-      if (!searchModalState.isOpen) {
-        searchModalState.onOpen()
-      }
-    },
-  })
-  const [showAll, setShowAll] = useState(true)
   const [search, setSearch] = useState('')
+  useShortcut(
+    {
+      Escape: (e: any) => {
+        if (search) {
+          e.preventDefault()
+          setSearch('')
+        }
+      },
+      n: (e: any) => {
+        if (!searchModalState.isOpen && !createTodoModalState.isOpen) {
+          e.preventDefault()
+          createTodoModalState.onOpen()
+        }
+      },
+      'meta-k': (e: any) => {
+        if (!searchModalState.isOpen) {
+          e.preventDefault()
+          searchModalState.onOpen()
+        }
+      },
+      '/': (e: any) => {
+        if (!searchModalState.isOpen) {
+          e.preventDefault()
+          searchModalState.onOpen()
+        }
+      },
+    },
+    [search, searchModalState.isOpen, createTodoModalState.isOpen]
+  )
+  const [showAll, setShowAll] = useState(true)
   const { invalidateQueries } = trpc.useContext()
   const todos = trpc.useQuery(['auth.todolist'])
   const doneTodo = trpc.useMutation('auth.done', {
@@ -90,27 +107,44 @@ const ViewTodos = (props: Props) => {
           </form>
         </Modal>
       )}
-      <Flex gap={4} py={2}>
-        <Button isActive={showAll} onClick={() => setShowAll(!showAll)} colorScheme="green" variant="outline">
-          show all
-        </Button>
-        <Button colorScheme="purple" onClick={() => createTodoModalState.onOpen()} variant="outline">
-          new todo
-        </Button>
-        <Button
-          colorScheme={!!search ? 'blue' : 'gray'}
-          isActive={!!search}
-          onClick={() => setSearch('')}
-          variant="outline"
-        >
-          clear search
-        </Button>
-      </Flex>
+      {!!todos.data?.length && (
+        <Flex gap={2} py={2} alignItems="center">
+          <Text display={{ base: 'none', md: 'block' }} fontSize="xl" color="gray.400">
+            Actions:
+          </Text>
+          <Button
+            isActive={showAll}
+            onClick={() => setShowAll(!showAll)}
+            colorScheme="green"
+            variant="outline"
+          >
+            show all
+          </Button>
+          <Button
+            colorScheme={!!search ? 'blue' : 'blue'}
+            isActive={!!search}
+            onClick={() => (search ? setSearch('') : searchModalState.onOpen())}
+            variant="outline"
+          >
+            {search ? 'clear search: ' + search : 'search'}
+          </Button>
+          <Button colorScheme="purple" onClick={() => createTodoModalState.onOpen()} variant="outline">
+            new todo
+          </Button>
+        </Flex>
+      )}
       <Flex flexDir="column" ref={ref} flex="1" overflow="auto" gap={2}>
+        {todos.data?.length === 0 && (
+          <Flex flexDir="column" alignItems="center" justifyContent="center" height="30%">
+            <Text fontSize="5xl">Create your first todo</Text>
+            <Button onClick={() => createTodoModalState.onOpen()} colorScheme="purple" size="lg">
+              create new todo
+            </Button>
+          </Flex>
+        )}
         {filteredTodos.map((x) => (
           <Flex
-            alignItems={{ base: 'unset', md: 'center' }}
-            gap={{ base: 0, md: 4 }}
+            alignItems={{ base: 'unset', md: 'strecht' }}
             boxShadow="md"
             border="1px solid #eee"
             bg="white"
@@ -119,11 +153,9 @@ const ViewTodos = (props: Props) => {
             position="relative"
             flexDir={{ base: 'column', md: 'row' }}
           >
-            <Badge position="absolute" bottom="0" right="0" fontSize="10px">
-              {x.id}
-            </Badge>
             <Text
               borderRadius="10px"
+              borderRightRadius="0"
               transition="background 300ms"
               _hover={{ background: 'blue.100' }}
               cursor="pointer"
@@ -140,9 +172,13 @@ const ViewTodos = (props: Props) => {
                 Done: {DateTime.fromJSDate(x.doneAt).toRelative()}
               </Badge>
             )}
-            <Flex>
+            <Flex display={{ base: 'none', md: 'flex' }}>
               <Button
+                height="100%"
+                _hover={{ bg: 'green.100' }}
+                borderRadius="0"
                 fontSize="3xl"
+                px={6}
                 colorScheme="green"
                 variant="ghost"
                 size="sm"
@@ -150,12 +186,15 @@ const ViewTodos = (props: Props) => {
               >
                 ✅
               </Button>
-
               <Button
-                mr={5}
+                height="100%"
+                borderRadius="0"
+                _hover={{ bg: 'red.100' }}
+                px={6}
                 fontSize="3xl"
                 colorScheme="red"
                 variant="ghost"
+                borderRightRadius="10px"
                 size="sm"
                 onClick={onDelete(x.id)}
               >
