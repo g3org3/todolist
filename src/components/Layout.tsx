@@ -24,7 +24,7 @@ const Layout = (props: Props) => {
         <title>Todolist</title>
       </Head>
       {status === 'authenticated' ? (
-        <Flex h="100vh" overflow="auto" bg="blackAlpha.50" flexDir="column" gap={7}>
+        <Flex h="100vh" overflow="auto" bg="blackAlpha.50" flexDir="column" gap={3}>
           <Navbar />
           <Container
             ref={ref}
@@ -32,7 +32,7 @@ const Layout = (props: Props) => {
             maxW="container.xl"
             display="flex"
             flexDir="column"
-            gap={5}
+            gap={2}
             overflow="auto"
           >
             {props.children}

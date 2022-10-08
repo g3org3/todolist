@@ -104,8 +104,15 @@ const ViewTodo = (props: Props) => {
   }
 
   return (
-    <Flex flexDir="column" flex="1" gap={5} overflow="auto">
-      <Flex alignItems="center" gap={4} bg="white" boxShadow="md" p={2}>
+    <Flex flexDir="column" flex="1" overflow="auto" boxShadow="md" bg="white">
+      <Flex
+        alignItems="center"
+        gap={4}
+        bg="white"
+        p={2}
+        borderTopLeftRadius="10px"
+        borderTopRightRadius="10px"
+      >
         <HeaderTodo
           onUpdateTitle={onUpdateTitle}
           onClickReset={props.onClickReset}
@@ -115,13 +122,8 @@ const ViewTodo = (props: Props) => {
           onClickEdit={onClick}
         />
       </Flex>
-      <Flex
-        overflow="auto"
-        gap={5}
-        alignItems={{ base: 'unset', md: 'flex-start' }}
-        flexDir={{ base: 'column', md: 'row' }}
-      >
-        <Flex flex="1" boxShadow="md" overflow="auto" bg="white">
+      <Flex overflow="auto" flex="1" flexDir={{ base: 'column', md: 'row' }}>
+        <Flex flex="1" overflow="auto" bg="white">
           {!isEditable && !props.selected.body && (
             <Flex bg="white" w="100%" h="300px" alignItems="center" justifyContent="center">
               <Button variant="outline" fontSize="3xl" size="lg" onClick={onClick}>
@@ -146,16 +148,8 @@ const ViewTodo = (props: Props) => {
             />
           )}
         </Flex>
-        <Flex
-          minH="200px"
-          position="sticky"
-          top="0"
-          w={{ base: 'unset', md: '30%' }}
-          bg="white"
-          flexDir="column"
-          boxShadow="md"
-        >
-          <Heading bg="blue.100" size="lg" textAlign="center" fontWeight="light">
+        <Flex w={{ base: 'unset', md: '30%' }} flexDir="column">
+          <Heading size="lg" textAlign="center" fontWeight="light">
             Checklist
           </Heading>
           <hr />
@@ -165,17 +159,20 @@ const ViewTodo = (props: Props) => {
               submit
             </Button>
           </form>
-          <Flex ref={checklistref} flexDir="column">
+          <Flex ref={checklistref} flexDir="column" flex="1">
             {checklists.data?.map((item) => (
               <Flex
                 key={item.id}
                 _hover={{ background: '#f8f8f8' }}
                 borderBottom="1px solid #eee"
-                flexDir="column"
+                alignItems="center"
               >
-                <Checkbox isChecked={!!item.doneAt} onChange={onCheck(item.id)} p={2} size="lg">
+                <Checkbox flex="1" isChecked={!!item.doneAt} onChange={onCheck(item.id)} p={2} size="lg">
                   {item.title}
                 </Checkbox>
+                <Button size="sm" colorScheme="red" variant="outline" mr={2}>
+                  X
+                </Button>
               </Flex>
             ))}
           </Flex>

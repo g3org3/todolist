@@ -40,7 +40,7 @@ function EditableControls() {
 const HeaderTodo = (props: Props) => {
   return (
     <>
-      <Button size="sm" fontSize="3xl" onClick={props.onClickReset}>
+      <Button h="100%" variant="outline" size="sm" fontSize="3xl" onClick={props.onClickReset}>
         ◀️
       </Button>
       <Heading fontWeight="light">
@@ -48,15 +48,14 @@ const HeaderTodo = (props: Props) => {
           key={props.title}
           onSubmit={props.onUpdateTitle}
           display="flex"
-          textAlign="center"
           alignItems="center"
           gap={2}
           defaultValue={props.title}
-          fontSize="3xl"
+          fontSize="5xl"
           isPreviewFocusable={false}
         >
           <EditablePreview />
-          <Input as={EditableInput} />
+          <Input fontSize="5xl" variant="unstyled" as={EditableInput} />
           <EditableControls />
         </Editable>
       </Heading>

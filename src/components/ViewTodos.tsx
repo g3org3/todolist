@@ -170,7 +170,8 @@ const ViewTodos = (props: Props) => {
               cursor="pointer"
               onClick={() => props.onClickSelect(x)}
               flex="1"
-              p={5}
+              p={2}
+              px={5}
               fontSize="3xl"
               textDecor={x.doneAt ? 'line-through' : undefined}
             >
