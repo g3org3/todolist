@@ -170,7 +170,7 @@ const ViewTodo = (props: Props) => {
                 <Checkbox flex="1" isChecked={!!item.doneAt} onChange={onCheck(item.id)} p={2} size="lg">
                   {item.title}
                 </Checkbox>
-                <Button size="sm" colorScheme="red" variant="outline" mr={2}>
+                <Button display="none" size="sm" colorScheme="red" variant="outline" mr={2}>
                   X
                 </Button>
               </Flex>
