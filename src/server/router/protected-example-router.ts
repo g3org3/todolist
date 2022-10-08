@@ -46,10 +46,16 @@ export const protectedExampleRouter = createProtectedRouter()
   .mutation('update', {
     input: z.object({
       id: z.string(),
-      body: z.string(),
+      body: z.string().nullish(),
+      title: z.string(),
     }),
     resolve: async ({ ctx, input }) => {
-      await ctx.prisma.todo.update({ data: { body: input.body }, where: { id: input.id } })
+      const payload = input.body ? { title: input.title, body: input.body } : { title: input.title }
+
+      await ctx.prisma.todo.update({
+        data: payload,
+        where: { id: input.id },
+      })
     },
   })
   .mutation('update-tag', {

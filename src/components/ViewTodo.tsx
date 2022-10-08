@@ -10,10 +10,11 @@ import { useShortcut } from 'utils/shortcuts'
 import { TodoOut, trpc } from 'utils/trpc'
 
 import Editor from './Editor'
+import HeaderTodo from './HeaderTodo'
 
 interface Props {
   selected: TodoOut
-  onClickReset: (todo: TodoOut | null) => void
+  onClickReset: VoidFunction
 }
 
 const ViewTodo = (props: Props) => {
@@ -81,7 +82,15 @@ const ViewTodo = (props: Props) => {
 
     updateBody.mutate({
       id: props.selected.id,
+      title: props.selected.title,
       body: JSON.stringify(editorRef.current.getEditorState()),
+    })
+  }
+
+  const onUpdateTitle = (title: string) => {
+    updateBody.mutate({
+      id: props.selected.id,
+      title,
     })
   }
 
@@ -97,14 +106,14 @@ const ViewTodo = (props: Props) => {
   return (
     <Flex flexDir="column" flex="1" gap={5}>
       <Flex alignItems="center" gap={4} bg="white" boxShadow="md" p={2}>
-        <Button size="sm" fontSize="3xl" onClick={() => props.onClickReset(null)}>
-          ◀️
-        </Button>
-        <Heading fontWeight="light">{props.selected.title}</Heading>
-        <Spacer />
-        <Button isLoading={updateBody.isLoading} onClick={onClick} variant="outline" colorScheme="blue">
-          {isEditable ? 'Save' : 'Edit'}
-        </Button>
+        <HeaderTodo
+          onUpdateTitle={onUpdateTitle}
+          onClickReset={props.onClickReset}
+          title={props.selected.title}
+          isEditable={isEditable}
+          isLoading={updateBody.isLoading}
+          onClickEdit={onClick}
+        />
       </Flex>
       <Flex gap={5} alignItems={{ base: 'unset', md: 'flex-start' }} flexDir={{ base: 'column', md: 'row' }}>
         <Flex flex="1" boxShadow="md" overflow="auto" bg="white">
@@ -117,7 +126,7 @@ const ViewTodo = (props: Props) => {
           )}
           {isEditable && (
             <Editor
-              key={`edit-${props.selected.id}`}
+              key={`edit-${props.selected.id}-${props.selected.body.length}`}
               ref={editorRef}
               isEditable
               value={props.selected.body}
@@ -125,7 +134,7 @@ const ViewTodo = (props: Props) => {
           )}
           {!isEditable && props.selected.body && (
             <Editor
-              key={`read-${props.selected.id}-${props.selected.body}`}
+              key={`read-${props.selected.id}-${props.selected.body.length}`}
               ref={editorRef}
               isEditable={false}
               value={props.selected.body}

@@ -1,6 +1,7 @@
 import { Flex, Badge, Button, Text, useToast, Input, useDisclosure } from '@chakra-ui/react'
 import autoAnimate from '@formkit/auto-animate'
 import { DateTime } from 'luxon'
+import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { useShortcut } from 'utils/shortcuts'
@@ -16,9 +17,11 @@ interface Props {
 const ViewTodos = (props: Props) => {
   const ref = useRef(null)
   const toaster = useToast()
+  const router = useRouter()
   const createTodoModalState = useDisclosure()
   const searchModalState = useDisclosure()
   const [search, setSearch] = useState('')
+  const todos = trpc.useQuery(['auth.todolist'])
   useShortcut(
     {
       Escape: (e: any) => {
@@ -31,6 +34,12 @@ const ViewTodos = (props: Props) => {
         if (!searchModalState.isOpen && !createTodoModalState.isOpen) {
           e.preventDefault()
           createTodoModalState.onOpen()
+        }
+      },
+      1: (e: any) => {
+        if (!searchModalState.isOpen && !createTodoModalState.isOpen && todos.data && todos.data[0]) {
+          router.push(`/todos/${todos.data[0].id}`)
+          e.preventDefault()
         }
       },
       'meta-k': (e: any) => {
@@ -50,7 +59,7 @@ const ViewTodos = (props: Props) => {
   )
   const [showAll, setShowAll] = useState(true)
   const { invalidateQueries } = trpc.useContext()
-  const todos = trpc.useQuery(['auth.todolist'])
+
   const doneTodo = trpc.useMutation('auth.done', {
     onSuccess() {
       invalidateQueries(['auth.todolist'])
@@ -168,20 +177,21 @@ const ViewTodos = (props: Props) => {
               {x.title}
             </Text>
             {x.doneAt && (
-              <Badge position="absolute" top="0" right="0" colorScheme="green">
+              <Badge zIndex="2" position="absolute" top="0" left="0" colorScheme="green">
                 Done: {DateTime.fromJSDate(x.doneAt).toRelative()}
               </Badge>
             )}
             <Flex display={{ base: 'none', md: 'flex' }}>
               <Button
                 height="100%"
-                _hover={{ bg: 'green.100' }}
+                _hover={{ bg: 'green.200' }}
                 borderRadius="0"
                 fontSize="3xl"
                 px={6}
                 colorScheme="green"
                 variant="ghost"
                 size="sm"
+                isActive={!!x.doneAt}
                 onClick={onDone(x.id, !x.doneAt)}
               >
                 ✅
