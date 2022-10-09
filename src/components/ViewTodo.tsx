@@ -1,16 +1,14 @@
-import { Flex, Button, Heading, Input, Checkbox, useToast, Spacer } from '@chakra-ui/react'
-import autoAnimate from '@formkit/auto-animate'
-import cuid from 'cuid'
+import { Flex, Button, useToast } from '@chakra-ui/react'
 import { LexicalEditor } from 'lexical'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
-import { getFormValues } from 'utils/form'
+import Checklist from 'components/Checklist'
+import Editor from 'components/Editor'
+import HeaderTodo from 'components/HeaderTodo'
+import ManageTag from 'components/ManageTag'
 import { useShortcut } from 'utils/shortcuts'
 import { TodoOut, trpc } from 'utils/trpc'
-
-import Editor from './Editor'
-import HeaderTodo from './HeaderTodo'
 
 interface Props {
   selected: TodoOut
@@ -29,16 +27,6 @@ const ViewTodo = (props: Props) => {
     },
     []
   )
-  const checklists = trpc.useQuery(['auth.checklist', props.selected.id], { enabled: !!props.selected.id })
-  const createChecklist = trpc.useMutation('auth.createChecklist', {
-    onSuccess() {
-      invalidateQueries(['auth.checklist'])
-      toaster({ title: 'success', status: 'success' })
-    },
-    onError(err) {
-      toaster({ title: 'Error', description: err.message, status: 'error' })
-    },
-  })
   const updateBody = trpc.useMutation('auth.update', {
     onSuccess() {
       invalidateQueries(['auth.todoid', props.selected.id])
@@ -48,34 +36,6 @@ const ViewTodo = (props: Props) => {
       toaster({ title: 'Error', description: err.message, status: 'error' })
     },
   })
-  const doneChecklist = trpc.useMutation('auth.checklistdone', {
-    onSuccess() {
-      invalidateQueries(['auth.checklist'])
-      toaster({ title: 'success', status: 'success' })
-    },
-    onError(err) {
-      toaster({ title: 'Error', description: err.message, status: 'error' })
-    },
-  })
-  const checklistFormRef = useRef<HTMLFormElement>(null)
-  const checklistref = useRef(null)
-
-  useEffect(() => {
-    checklistref.current && autoAnimate(checklistref.current)
-  }, [checklistref])
-
-  const onCheck = (id: string) => (e: any) => {
-    doneChecklist.mutate({ id, isChecked: e.target.checked })
-  }
-
-  const onSubmitChecklist: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault()
-    const entity = getFormValues<{ title: { value: string } }>(checklistFormRef.current)
-    if (!entity || !props.selected) return
-    const title = entity.title.value
-    createChecklist.mutate({ id: cuid(), title, todoId: props.selected.id })
-    entity.title.value = ''
-  }
 
   const onSave = () => {
     if (!editorRef.current) return
@@ -149,34 +109,9 @@ const ViewTodo = (props: Props) => {
             />
           )}
         </Flex>
-        <Flex w={{ base: 'unset', md: '30%' }} flexDir="column">
-          <Heading size="lg" textAlign="center" fontWeight="light">
-            Checklist
-          </Heading>
-          <hr />
-          <form ref={checklistFormRef} onSubmit={onSubmitChecklist}>
-            <Input name="title" placeholder="new checklist item" borderRadius="0" />
-            <Button type="submit" display="none">
-              submit
-            </Button>
-          </form>
-          <Flex ref={checklistref} flexDir="column" flex="1">
-            {checklists.data?.map((item) => (
-              <Flex
-                key={item.id}
-                _hover={{ background: '#f8f8f8' }}
-                borderBottom="1px solid #eee"
-                alignItems="center"
-              >
-                <Checkbox flex="1" isChecked={!!item.doneAt} onChange={onCheck(item.id)} p={2} size="lg">
-                  {item.title}
-                </Checkbox>
-                <Button display="none" size="sm" colorScheme="red" variant="outline" mr={2}>
-                  X
-                </Button>
-              </Flex>
-            ))}
-          </Flex>
+        <Flex w={{ base: 'unset', md: '30%' }} flexDir="column" py={1}>
+          <ManageTag tag={props.selected.tag} todoId={props.selected.id} />
+          <Checklist todoId={props.selected.id} />
         </Flex>
       </Flex>
     </Flex>

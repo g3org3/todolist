@@ -1,17 +1,6 @@
-import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  ButtonGroup,
-  Editable,
-  EditableInput,
-  EditablePreview,
-  Flex,
-  Heading,
-  IconButton,
-  Input,
-  Spacer,
-  useEditableControls,
-} from '@chakra-ui/react'
+import { Button, Editable, EditableInput, EditablePreview, Heading, Input, Spacer } from '@chakra-ui/react'
+
+import EditControls from './EditControls'
 
 interface Props {
   onClickReset: VoidFunction
@@ -20,21 +9,6 @@ interface Props {
   isEditable?: boolean
   title: string
   onClickEdit: VoidFunction
-}
-
-function EditableControls() {
-  const { isEditing, getSubmitButtonProps, getCancelButtonProps, getEditButtonProps } = useEditableControls()
-
-  return isEditing ? (
-    <ButtonGroup justifyContent="center" size="sm">
-      <IconButton aria-label="save" icon={<CheckIcon />} {...getSubmitButtonProps()} />
-      <IconButton aria-label="cancel" icon={<CloseIcon />} {...getCancelButtonProps()} />
-    </ButtonGroup>
-  ) : (
-    <Flex justifyContent="center">
-      <IconButton aria-label="edit" size="sm" icon={<EditIcon />} {...getEditButtonProps()} />
-    </Flex>
-  )
 }
 
 const HeaderTodo = (props: Props) => {
@@ -56,7 +30,7 @@ const HeaderTodo = (props: Props) => {
         >
           <EditablePreview />
           <Input fontSize="5xl" variant="unstyled" as={EditableInput} />
-          <EditableControls />
+          <EditControls />
         </Editable>
       </Heading>
       <Spacer />

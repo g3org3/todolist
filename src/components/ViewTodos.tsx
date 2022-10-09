@@ -2,7 +2,7 @@ import { Flex, Badge, Button, Text, useToast, Input, useDisclosure } from '@chak
 import autoAnimate from '@formkit/auto-animate'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useShortcut } from 'utils/shortcuts'
 import { TodoOut, trpc } from 'utils/trpc'
@@ -20,7 +20,7 @@ const ViewTodos = (props: Props) => {
   const router = useRouter()
   const createTodoModalState = useDisclosure()
   const searchModalState = useDisclosure()
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState((router.query.search as string | null) || '')
   const todos = trpc.useQuery(['auth.todolist'])
   useShortcut(
     {
@@ -43,13 +43,13 @@ const ViewTodos = (props: Props) => {
         }
       },
       'meta-k': (e: any) => {
-        if (!searchModalState.isOpen) {
+        if (!searchModalState.isOpen && !createTodoModalState.isOpen) {
           e.preventDefault()
           searchModalState.onOpen()
         }
       },
       '/': (e: any) => {
-        if (!searchModalState.isOpen) {
+        if (!searchModalState.isOpen && !createTodoModalState.isOpen) {
           e.preventDefault()
           searchModalState.onOpen()
         }
@@ -93,13 +93,27 @@ const ViewTodos = (props: Props) => {
   const onSearch = () => {
     const value = searchRef.current?.value || ''
     setSearch(value)
+    router.push({ pathname: '/todos', query: { search: value } })
     searchModalState.onClose()
   }
 
-  const filteredTodos =
-    todos.data
-      ?.filter((x) => showAll || !x.doneAt)
-      .filter((x) => !search || x.title.toLowerCase().includes(search.toLowerCase())) || []
+  const filteredTodos = useMemo(() => {
+    return (
+      todos.data
+        ?.filter((x) => showAll || !x.doneAt)
+        .filter((x) => {
+          if (!search) return true
+
+          if (search.includes('tag:') && x.tag) {
+            const s = search.split('tag:').join('').trim()
+
+            return x.tag.toLowerCase().includes(s)
+          }
+
+          return x.title.toLowerCase().includes(search.toLowerCase())
+        }) || []
+    )
+  }, [showAll, todos.data, search])
 
   return (
     <>
@@ -176,6 +190,7 @@ const ViewTodos = (props: Props) => {
               textDecor={x.doneAt ? 'line-through' : undefined}
             >
               {x.title}
+              <Badge colorScheme="blue">{x.tag}</Badge>
             </Text>
             {x.doneAt && (
               <Badge zIndex="2" position="absolute" top="0" left="0" colorScheme="green">
