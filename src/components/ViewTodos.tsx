@@ -188,9 +188,14 @@ const ViewTodos = (props: Props) => {
               px={5}
               fontSize="3xl"
               textDecor={x.doneAt ? 'line-through' : undefined}
+              display="flex"
+              alignItems="center"
+              gap={2}
             >
               {x.title}
-              <Badge colorScheme="blue">{x.tag}</Badge>
+              <Badge variant="solid" colorScheme="blue">
+                {x.tag}
+              </Badge>
             </Text>
             {x.doneAt && (
               <Badge zIndex="2" position="absolute" top="0" left="0" colorScheme="green">
