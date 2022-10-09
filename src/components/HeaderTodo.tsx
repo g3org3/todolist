@@ -49,7 +49,7 @@ const HeaderTodo = (props: Props) => {
           onSubmit={props.onUpdateTitle}
           display="flex"
           alignItems="center"
-          gap={2}
+          gap={10}
           defaultValue={props.title}
           fontSize="5xl"
           isPreviewFocusable={false}

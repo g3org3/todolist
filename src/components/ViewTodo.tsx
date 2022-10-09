@@ -41,7 +41,7 @@ const ViewTodo = (props: Props) => {
   })
   const updateBody = trpc.useMutation('auth.update', {
     onSuccess() {
-      invalidateQueries(['auth.checklist'])
+      invalidateQueries(['auth.todoid', props.selected.id])
       toaster({ title: 'success', status: 'success' })
     },
     onError(err) {
@@ -104,15 +104,16 @@ const ViewTodo = (props: Props) => {
   }
 
   return (
-    <Flex flexDir="column" flex="1" overflow="auto" boxShadow="md" bg="white">
-      <Flex
-        alignItems="center"
-        gap={4}
-        bg="white"
-        p={2}
-        borderTopLeftRadius="10px"
-        borderTopRightRadius="10px"
-      >
+    <Flex
+      flexDir="column"
+      flex="1"
+      overflow="auto"
+      boxShadow="md"
+      bg="white"
+      borderTopLeftRadius="10px"
+      borderTopRightRadius="10px"
+    >
+      <Flex alignItems="center" gap={4} p={2}>
         <HeaderTodo
           onUpdateTitle={onUpdateTitle}
           onClickReset={props.onClickReset}
