@@ -31,6 +31,7 @@ import { createPortal } from 'react-dom'
 import Modal from 'components/Modal'
 
 import { INSERT_EXCALIDRAW_COMMAND } from './ExcalidrawPlugin'
+import { InsertImageDialog } from './ImagePlugin'
 import { INSERT_YOUTUBE_COMMAND } from './YoutubePlugin'
 
 const LowPriority = 1
@@ -673,10 +674,44 @@ export default function ToolbarPlugin() {
           >
             excalidraw
           </button>
+          <ImageButton editor={editor} />
           <YTButton editor={editor} />
         </>
       )}
     </div>
+  )
+}
+
+const ImageButton = ({ editor }: { editor: any }) => {
+  // const inputref = useRef<HTMLInputElement>(null)
+  const state = useDisclosure()
+
+  const onClick = () => {
+    // if (!inputref.current) return
+    // const VIDEO_MATCHER = /\?v=(\w+)/
+    // const { value } = inputref.current
+    // const match = VIDEO_MATCHER.exec(value)
+    // if (!match) return
+    // const code = match[1]
+    // editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, code)
+    // state.onClose()
+  }
+
+  return (
+    <Modal
+      close={state.onClose}
+      isOpen={state.isOpen}
+      Button={() => (
+        <button onClick={() => state.onOpen()} className="toolbar-item">
+          image
+        </button>
+      )}
+      size="3xl"
+    >
+      <Flex flexDir="column" gap={4}>
+        <InsertImageDialog activeEditor={editor} onClose={state.onClose} />
+      </Flex>
+    </Modal>
   )
 }
 

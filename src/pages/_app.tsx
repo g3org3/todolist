@@ -11,6 +11,7 @@ import superjson from 'superjson'
 import Layout from 'components/Layout'
 import type { AppRouter } from 'server/router'
 import 'styles/globals.css'
+import 'components/Editor/nodes/ImageNode.css'
 
 const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { session, ...pageProps } }) => {
   return (

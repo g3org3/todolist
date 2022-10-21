@@ -16,11 +16,13 @@ import { LexicalEditor } from 'lexical'
 import { forwardRef, Ref, useImperativeHandle, useRef } from 'react'
 
 import { ExcalidrawNode } from './nodes/ExcalidrawNode'
+import { ImageNode } from './nodes/ImageNode'
 import { YouTubeNode } from './nodes/YoutubeNode'
 import AutoLinkPlugin from './plugins/AutoLinkPlugin'
 import CodeHighlightPlugin from './plugins/CodeHighlightPlugin'
 import ExcalidrawPlugin from './plugins/ExcalidrawPlugin'
 import FormPlugin from './plugins/FormPlugin'
+import ImagesPlugin from './plugins/ImagePlugin'
 import ListMaxIndentLevelPlugin from './plugins/ListMaxIndentLevelPlugin'
 import ToolbarPlugin from './plugins/ToolbarPlugin'
 import YouTubePlugin from './plugins/YoutubePlugin'
@@ -68,6 +70,7 @@ const Editor = (props: Props, ref?: Ref<unknown>) => {
           LinkNode,
           ExcalidrawNode,
           YouTubeNode,
+          ImageNode,
         ],
       }}
     >
@@ -88,6 +91,7 @@ const Editor = (props: Props, ref?: Ref<unknown>) => {
           <AutoLinkPlugin />
           <ListMaxIndentLevelPlugin maxDepth={7} />
           <YouTubePlugin />
+          <ImagesPlugin />
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
         </div>
       </div>
